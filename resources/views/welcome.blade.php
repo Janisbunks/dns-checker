@@ -79,6 +79,18 @@
                   </div>
                 @endif
 
+                @if($isExternalCloudflare && !$isCloudflare)
+                  <div class="bg-gradient-to-r from-red-50 to-orange-50 border-l-4 border-red-500 text-red-700 p-6 rounded-xl shadow-lg backdrop-blur-sm mt-6">
+                    <div class="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-2h-2v2zm0-4h2V7h-2v6z"/>
+                      </svg>
+                      <p class="font-medium text-lg">Warning: This domain is using external Cloudflare and may be hosted on our servers.</p>
+                    </div>
+                    <p class="text-sm text-gray-600 italic">It may be worth checking this <a href="https://docs.google.com/spreadsheets/d/1Pd7bVE6k8VhcP8HwRR44h1WgiL6sTozeNQQfHE9VASQ/edit?gid=1696779875#gid=1696779875" target="_blank" class="text-indigo-600 underline font-bold hover:text-indigo-800">IP Address sheet</a></p>
+                  </div>
+                @endif
+
                 @php $delay = 0; @endphp
                 @foreach($records as $type => $typeRecords)
                   <div class="overflow-hidden rounded-xl bg-white/80 shadow-lg backdrop-blur-sm result-item" style="animation-delay: {{ $delay * 0.05 }}s;">
@@ -142,7 +154,6 @@
         }
       }
 
-      /* Add subtle background animation */
       body::before {
         content: '';
         position: fixed;
