@@ -43,7 +43,16 @@
 
             @if($records)
               <div class="mt-10 space-y-8">
-                @if(count($matchedServers) > 0)
+                @if(isset($hasNoRecords) && $hasNoRecords)
+                  <div class="bg-gradient-to-r from-red-50 to-rose-50 border-l-4 border-red-500 text-red-700 p-6 rounded-xl shadow-lg backdrop-blur-sm">
+                    <div class="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                      <p class="font-medium text-lg">This domain does not hold any DNS records for now.</p>
+                    </div>
+                  </div>
+                @elseif(count($matchedServers) > 0)
                   <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 text-green-700 p-6 rounded-xl shadow-lg backdrop-blur-sm">
                     <h3 class="font-semibold text-xl mb-3">Domain is hosted on our servers:</h3>
                     <div class="space-y-4">
@@ -52,7 +61,7 @@
                           <p class="font-medium text-lg">{{ $server['name'] }}</p>
                           <p class="text-sm text-gray-600">IP: {{ $server['ip'] }}</p>
                           <a href="{{ $server['url'] }}" target="_blank" 
-                             class="text-indigo-600 hover:text-indigo-800 text-sm inline-flex items-center mt-2 group">
+                            class="text-indigo-600 hover:text-indigo-800 text-sm inline-flex items-center mt-2 group">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                             </svg>
@@ -91,45 +100,47 @@
                   </div>
                 @endif
 
-                @php $delay = 0; @endphp
-                @foreach($records as $type => $typeRecords)
-                  <div class="overflow-hidden rounded-xl bg-white/80 shadow-lg backdrop-blur-sm result-item" style="animation-delay: {{ $delay * 0.05 }}s;">
-                    <div class="px-6 py-6">
-                      <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ $type }} Records</h3>
-                      @if(count($typeRecords) > 0)
-                        <div class="space-y-4">
-                          @foreach($typeRecords as $record)
-                            <div class="bg-white/90 p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200">
-                              <dl class="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
-                                <div>
-                                  <dt class="text-sm font-medium text-gray-500">Host</dt>
-                                  <dd class="text-sm text-gray-900 font-medium">{{ (new ReflectionClass($record))->getProperty('host')->getValue($record) }}</dd>
-                                </div>
-                                @if(property_exists($record, 'ip'))
+                @if(!isset($hasNoRecords) || !$hasNoRecords)
+                  @php $delay = 0; @endphp
+                  @foreach($records as $type => $typeRecords)
+                    <div class="overflow-hidden rounded-xl bg-white/80 shadow-lg backdrop-blur-sm result-item" style="animation-delay: {{ $delay * 0.05 }}s;">
+                      <div class="px-6 py-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ $type }} Records</h3>
+                        @if(count($typeRecords) > 0)
+                          <div class="space-y-4">
+                            @foreach($typeRecords as $record)
+                              <div class="bg-white/90 p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200">
+                                <dl class="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
                                   <div>
-                                    <dt class="text-sm font-medium text-gray-500">IP</dt>
-                                    <dd class="text-sm text-gray-900 font-medium">{{ (new ReflectionClass($record))->getProperty('ip')->getValue($record) }}</dd>
+                                    <dt class="text-sm font-medium text-gray-500">Host</dt>
+                                    <dd class="text-sm text-gray-900 font-medium">{{ (new ReflectionClass($record))->getProperty('host')->getValue($record) }}</dd>
                                   </div>
-                                @endif
-                                @if(property_exists($record, 'target'))
-                                  <div>
-                                    <dt class="text-sm font-medium text-gray-500">Target</dt>
-                                    <dd class="text-sm text-gray-900 font-medium">{{ (new ReflectionClass($record))->getProperty('target')->getValue($record) }}</dd>
-                                  </div>
-                                @endif
-                              </dl>
-                            </div>
-                          @endforeach
-                        </div>
-                      @else
-                        <div class="bg-gradient-to-r from-yellow-50 to-amber-50 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-xl shadow-sm">
-                          <p>No records found.</p>
-                        </div>
-                      @endif
+                                  @if(property_exists($record, 'ip'))
+                                    <div>
+                                      <dt class="text-sm font-medium text-gray-500">IP</dt>
+                                      <dd class="text-sm text-gray-900 font-medium">{{ (new ReflectionClass($record))->getProperty('ip')->getValue($record) }}</dd>
+                                    </div>
+                                  @endif
+                                  @if(property_exists($record, 'target'))
+                                    <div>
+                                      <dt class="text-sm font-medium text-gray-500">Target</dt>
+                                      <dd class="text-sm text-gray-900 font-medium">{{ (new ReflectionClass($record))->getProperty('target')->getValue($record) }}</dd>
+                                    </div>
+                                  @endif
+                                </dl>
+                              </div>
+                            @endforeach
+                          </div>
+                        @else
+                          <div class="bg-gradient-to-r from-yellow-50 to-amber-50 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-xl shadow-sm">
+                            <p>No records found.</p>
+                          </div>
+                        @endif
+                      </div>
                     </div>
-                  </div>
-                  @php $delay++; @endphp
-                @endforeach
+                    @php $delay++; @endphp
+                  @endforeach
+                @endif
               </div>
             @endif
           </div>
